@@ -1,0 +1,113 @@
+preprocessing:
+  change_col_types:
+    author: category
+    district: category
+    street: category
+    underground: category
+    residential_complex: category
+    line: category
+    area: category
+    insufficient_infrastructure: int32
+    convenient_for_life: int32
+    very_convenient_for_life: int32
+    few_entertainment: int32
+    cultural: int32
+    entertainment: int32
+    cultural_entertainment: int32
+    eco_rating: int32
+    population: int32
+    floor: int32
+    floors_count: int32
+    rooms_count: int32
+    author_count: int32
+    line_count: int32
+    floor_position: int32
+    author_more: int32
+    house_category: int32
+    total_meters: float32
+    square: float32
+    housing_fund_area: float32
+  columns_fill_na:
+    square: '-1'
+    housing_fund_area: '-1'
+    convenient_for_life: -1
+    insufficient_infrastructure: -1
+    very_convenient_for_life: -1
+    few_entertainment: -1
+    cultural: -1
+    entertainment: -1
+    cultural_entertainment: -1
+    top_residential_infrastructure: -1
+    top_entertainment_infrastructure: -1
+    eco_rating: -1
+    population: -1
+    floor: -1
+    floors_count: -1
+    rooms_count: -1
+    author_count: -1
+    author: None
+    district: None
+    street: None
+    underground: None
+    residential_complex: None
+    Station: None
+    line: None
+    area: None
+    line_count: -1
+  target_column: price
+  drop_columns: ['city', 'deal_type', 'accommodation_type', 'Station', 'link', 'price_per_m2',  'Район', author_type]
+  rename_columns:
+    Площадь: square
+    Население: population
+    Площадь жилфонда: housing_fund_area
+    Line: line
+  df_add:
+    - path: '../data/add/underground.csv'
+      sep: ';'
+      encoding: 'cp1251'
+
+    - path: '../data/add/Moscow_Population_2018.csv'
+      encoding: 'utf-8'
+
+    - path: '../data/add/eco.csv'
+
+    - path: '../data/add/raiting_yandex.csv'
+      encoding: 'cp1251'
+      sep: '\t'
+  df_add_col: [['Station', 'Line'], null, null, ['Район', 'Площадь', 'Население', 'Площадь жилфонда']]
+  df_add_left: ['underground', 'district', 'district', 'district']
+  df_add_right: ['Station', 'district', 'district', 'Район']
+  how: left
+  test_size: 0.25
+  random_state: 10
+  drop_duplicates: ['link', 'price']
+  dot_replace: ['square', 'housing_fund_area']
+  train_path: ../data/train/train.csv
+  unique_values_path: ../data/agg/unique_values.json
+  train_path_proc: ../data/agg/train.csv
+  test_path_proc: ../data/agg/test.csv
+  final_df: ../data/agg/cian_final.csv
+  
+
+train:
+  test_size: 0.25
+  random_state: 10
+  val_size: 0.16
+  k_folds: 5
+  n_trials: 4
+  target_column: price
+  model_path: ../models/model_clf.joblib
+  study_path: ../models/study.joblib
+  metrics_path: ../report/metrics.json
+  overfiting_path: ../report/overfiting.json
+
+evaluate:
+  predict_path: ../data/check/test.csv
+
+endpoints:
+  train: 'http://fastapi:8000/train'
+  prediction_from_file: 'http://fastapi:8000/predict'
+  prediction_input: 'http://fastapi:8000/predict_input'
+  #train: 'http://localhost:8000/train'
+  #prediction_input: 'http://localhost:8000/predict_input'
+  #prediction_from_file: 'http://localhost:8000/predict'
